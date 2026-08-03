@@ -37,6 +37,9 @@ class Slugify(unittest.TestCase):
     def test_solo_separatori_danno_stringa_vuota(self):
         self.assertEqual(slugify(" -- ,! "), "")
 
+    def test_conserva_gli_alfanumerici_non_ascii(self):
+        self.assertEqual(slugify("Città Fantàstica"), "città-fantàstica")
+
 
 if __name__ == "__main__":
     unittest.main()

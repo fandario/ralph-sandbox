@@ -2,7 +2,7 @@
 
 import re
 
-_SEPARATORI = re.compile(r"[\W_]+", re.UNICODE)
+_SEPARATORI = re.compile(r"[\W_]+")
 
 
 def squeeze(value: str) -> str:
