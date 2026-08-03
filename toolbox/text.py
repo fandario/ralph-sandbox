@@ -20,6 +20,11 @@ def truncate(value: str, limit: int) -> str:
     return value[: limit - 1] + "…"
 
 
+def titlecase(value: str) -> str:
+    """Mette in maiuscolo l'iniziale di ogni parola e in minuscolo il resto."""
+    return " ".join(parola.capitalize() for parola in value.split())
+
+
 def slugify(value: str) -> str:
     """Trasforma la stringa in un identificatore minuscolo con le parole unite da `-`."""
     # NFC dopo il minuscolo: ricompone i segni combinanti, che altrimenti `\W`

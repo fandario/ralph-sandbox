@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from toolbox.text import slugify, squeeze, truncate  # noqa: E402
+from toolbox.text import slugify, squeeze, titlecase, truncate  # noqa: E402
 
 
 class Squeeze(unittest.TestCase):
@@ -78,6 +78,29 @@ class Slugify(unittest.TestCase):
             slugify(unicodedata.normalize("NFC", parola)),
         )
         self.assertEqual(slugify(unicodedata.normalize("NFD", parola)), "città-di-milano")
+
+
+class Titlecase(unittest.TestCase):
+    def test_mette_in_maiuscolo_l_iniziale_di_ogni_parola(self):
+        self.assertEqual(titlecase("ciao mondo"), "Ciao Mondo")
+
+    def test_mette_in_minuscolo_il_resto_della_parola(self):
+        self.assertEqual(titlecase("cIAO MONDO"), "Ciao Mondo")
+
+    def test_normalizza_gli_spazi_come_squeeze(self):
+        self.assertEqual(titlecase("  ciao   MONDO "), "Ciao Mondo")
+
+    def test_tratta_i_tab_come_spazi(self):
+        self.assertEqual(titlecase("ciao\t\tmondo"), "Ciao Mondo")
+
+    def test_lascia_vuota_la_stringa_vuota(self):
+        self.assertEqual(titlecase(""), "")
+
+    def test_lascia_vuota_una_stringa_di_soli_spazi(self):
+        self.assertEqual(titlecase("   "), "")
+
+    def test_mette_in_maiuscolo_anche_le_lettere_accentate(self):
+        self.assertEqual(titlecase("èlia di milano"), "Èlia Di Milano")
 
 
 if __name__ == "__main__":
