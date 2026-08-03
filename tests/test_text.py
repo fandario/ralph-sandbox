@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from toolbox.text import squeeze, truncate  # noqa: E402
+from toolbox.text import slugify, squeeze, truncate  # noqa: E402
 
 
 class Squeeze(unittest.TestCase):
@@ -37,6 +37,32 @@ class Truncate(unittest.TestCase):
     def test_rifiuta_un_limite_minore_di_uno(self):
         with self.assertRaises(ValueError):
             truncate("buongiorno", 0)
+
+
+class Slugify(unittest.TestCase):
+    def test_trasforma_un_titolo_in_un_identificatore(self):
+        self.assertEqual(slugify("  Ciao, Mondo!! "), "ciao-mondo")
+
+    def test_tiene_le_lettere_accentate_che_sono_alfanumeriche(self):
+        self.assertEqual(slugify("Città di Milano"), "città-di-milano")
+
+    def test_tratta_il_trattino_basso_come_separatore(self):
+        self.assertEqual(slugify("ciao_mondo"), "ciao-mondo")
+
+    def test_mette_tutto_in_minuscolo(self):
+        self.assertEqual(slugify("CIAO"), "ciao")
+
+    def test_riduce_una_sequenza_di_separatori_a_un_solo_trattino(self):
+        self.assertEqual(slugify("ciao -- , mondo"), "ciao-mondo")
+
+    def test_toglie_i_trattini_ai_bordi(self):
+        self.assertEqual(slugify("!!ciao mondo!!"), "ciao-mondo")
+
+    def test_lascia_vuota_la_stringa_vuota(self):
+        self.assertEqual(slugify(""), "")
+
+    def test_lascia_vuota_una_stringa_di_soli_separatori(self):
+        self.assertEqual(slugify("  --,, "), "")
 
 
 if __name__ == "__main__":
