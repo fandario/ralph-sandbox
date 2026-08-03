@@ -1,4 +1,5 @@
 import sys
+import unicodedata
 import unittest
 from pathlib import Path
 
@@ -63,6 +64,20 @@ class Slugify(unittest.TestCase):
 
     def test_lascia_vuota_una_stringa_di_soli_separatori(self):
         self.assertEqual(slugify("  --,, "), "")
+
+    def test_tiene_le_cifre(self):
+        self.assertEqual(slugify("Report 2024"), "report-2024")
+
+    def test_lascia_invariato_uno_slug_gia_formato(self):
+        self.assertEqual(slugify("già-fatto"), "già-fatto")
+
+    def test_da_lo_stesso_slug_per_le_due_forme_unicode(self):
+        parola = "città di Milano"
+        self.assertEqual(
+            slugify(unicodedata.normalize("NFD", parola)),
+            slugify(unicodedata.normalize("NFC", parola)),
+        )
+        self.assertEqual(slugify(unicodedata.normalize("NFD", parola)), "città-di-milano")
 
 
 if __name__ == "__main__":
