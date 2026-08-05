@@ -26,6 +26,13 @@ def titlecase(value: str) -> str:
     return " ".join(parola.capitalize() for parola in squeeze(value).split(" "))
 
 
+def initials(value: str) -> str:
+    """Unisce in maiuscolo la prima lettera di ogni parola."""
+    # Come `titlecase`, delega a `squeeze` la politica sugli spazi; lo `split`
+    # senza argomenti non produce parole vuote, nemmeno sulla stringa vuota.
+    return "".join(parola[0] for parola in squeeze(value).split()).upper()
+
+
 def slugify(value: str) -> str:
     """Trasforma la stringa in un identificatore minuscolo con le parole unite da `-`."""
     # NFC dopo il minuscolo: ricompone i segni combinanti, che altrimenti `\W`
