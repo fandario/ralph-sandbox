@@ -137,6 +137,14 @@ class Initials(unittest.TestCase):
     def test_mette_in_maiuscolo_anche_le_lettere_accentate(self):
         self.assertEqual(initials("èlia òrsi"), "ÈÒ")
 
+    def test_da_le_stesse_iniziali_per_le_due_forme_unicode(self):
+        nome = "èlia òrsi"
+        self.assertEqual(
+            initials(unicodedata.normalize("NFD", nome)),
+            initials(unicodedata.normalize("NFC", nome)),
+        )
+        self.assertEqual(initials(unicodedata.normalize("NFD", nome)), "ÈÒ")
+
 
 if __name__ == "__main__":
     unittest.main()
