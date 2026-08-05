@@ -42,6 +42,17 @@ def initials(value: str) -> str:
     return "".join(parola[0] for parola in normalizzata.split()).upper()
 
 
+def strip_accents(value: str) -> str:
+    """Toglie gli accenti dalle lettere lasciando invariato il resto della stringa."""
+    # NFD separa la lettera dal suo segno diacritico, che ha categoria "Mn"
+    # (mark, nonspacing): scartando quelli resta la lettera nuda.
+    decomposta = unicodedata.normalize("NFD", value)
+    senza_segni = "".join(c for c in decomposta if unicodedata.category(c) != "Mn")
+    # NFC finale: quello che NFD ha scomposto senza essere un accento — l'hangul,
+    # per dire — torna com'era, e la forma d'ingresso non cambia il risultato.
+    return unicodedata.normalize("NFC", senza_segni)
+
+
 def slugify(value: str) -> str:
     """Trasforma la stringa in un identificatore minuscolo con le parole unite da `-`."""
     # NFC dopo il minuscolo: ricompone i segni combinanti, che altrimenti `\W`

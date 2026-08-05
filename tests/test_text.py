@@ -10,6 +10,7 @@ from toolbox.text import (  # noqa: E402
     reverse_words,
     slugify,
     squeeze,
+    strip_accents,
     titlecase,
     truncate,
 )
@@ -175,6 +176,39 @@ class Initials(unittest.TestCase):
             initials(unicodedata.normalize("NFC", nome)),
         )
         self.assertEqual(initials(unicodedata.normalize("NFD", nome)), "ÈÒ")
+
+
+class StripAccents(unittest.TestCase):
+    def test_toglie_l_accento_tenendo_la_lettera(self):
+        self.assertEqual(strip_accents("perché"), "perche")
+
+    def test_toglie_l_accento_grave(self):
+        self.assertEqual(strip_accents("città"), "citta")
+
+    def test_lascia_invariati_i_caratteri_senza_accento(self):
+        self.assertEqual(strip_accents("ciao mondo"), "ciao mondo")
+
+    def test_lascia_vuota_la_stringa_vuota(self):
+        self.assertEqual(strip_accents(""), "")
+
+    def test_tiene_le_maiuscole(self):
+        self.assertEqual(strip_accents("Èlia"), "Elia")
+
+    def test_lascia_invariati_spazi_e_punteggiatura(self):
+        self.assertEqual(strip_accents("  perché, però!  "), "  perche, pero!  ")
+
+    def test_da_lo_stesso_risultato_per_le_due_forme_unicode(self):
+        parola = "città"
+        self.assertEqual(
+            strip_accents(unicodedata.normalize("NFD", parola)),
+            strip_accents(unicodedata.normalize("NFC", parola)),
+        )
+        self.assertEqual(strip_accents(unicodedata.normalize("NFD", parola)), "citta")
+
+    def test_ricompone_i_caratteri_scomponibili_che_non_sono_accenti(self):
+        # "한" si scompone in jamo che non sono segni diacritici: senza
+        # ricomposizione finale uscirebbe spezzettato, e non è un accento.
+        self.assertEqual(strip_accents("한"), "한")
 
 
 if __name__ == "__main__":
