@@ -88,7 +88,10 @@ class Titlecase(unittest.TestCase):
         self.assertEqual(titlecase("cIAO MONDO"), "Ciao Mondo")
 
     def test_normalizza_gli_spazi_come_squeeze(self):
-        self.assertEqual(titlecase("  ciao   MONDO "), "Ciao Mondo")
+        grezza = "  ciao   MONDO "
+        self.assertEqual(titlecase(grezza), "Ciao Mondo")
+        # Parità con `squeeze`: se la sua politica sugli spazi cambia, qui si vede.
+        self.assertEqual(titlecase(grezza).lower(), squeeze(grezza).lower())
 
     def test_tratta_i_tab_come_spazi(self):
         self.assertEqual(titlecase("ciao\t\tmondo"), "Ciao Mondo")

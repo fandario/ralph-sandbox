@@ -22,7 +22,8 @@ def truncate(value: str, limit: int) -> str:
 
 def titlecase(value: str) -> str:
     """Mette in maiuscolo l'iniziale di ogni parola e in minuscolo il resto."""
-    return " ".join(parola.capitalize() for parola in value.split())
+    # Delega a `squeeze` la politica sugli spazi, così resta una sola.
+    return " ".join(parola.capitalize() for parola in squeeze(value).split(" "))
 
 
 def slugify(value: str) -> str:
