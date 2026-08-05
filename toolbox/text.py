@@ -26,6 +26,16 @@ def titlecase(value: str) -> str:
     return " ".join(parola.capitalize() for parola in squeeze(value).split(" "))
 
 
+def initials(value: str) -> str:
+    """Unisce in maiuscolo la prima lettera di ogni parola."""
+    # NFC come in `slugify`: ricompone i segni combinanti, altrimenti l'iniziale
+    # di una lettera accentata in NFD sarebbe la lettera nuda senza accento.
+    # Lo `split` senza argomenti divide su qualunque sequenza di spazi bianchi,
+    # bordi compresi, e non produce parole vuote nemmeno sulla stringa vuota.
+    normalizzata = unicodedata.normalize("NFC", value)
+    return "".join(parola[0] for parola in normalizzata.split()).upper()
+
+
 def slugify(value: str) -> str:
     """Trasforma la stringa in un identificatore minuscolo con le parole unite da `-`."""
     # NFC dopo il minuscolo: ricompone i segni combinanti, che altrimenti `\W`

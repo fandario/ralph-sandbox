@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from toolbox.text import slugify, squeeze, titlecase, truncate  # noqa: E402
+from toolbox.text import initials, slugify, squeeze, titlecase, truncate  # noqa: E402
 
 
 class Squeeze(unittest.TestCase):
@@ -104,6 +104,46 @@ class Titlecase(unittest.TestCase):
 
     def test_mette_in_maiuscolo_anche_le_lettere_accentate(self):
         self.assertEqual(titlecase("èlia di milano"), "Èlia Di Milano")
+
+
+class Initials(unittest.TestCase):
+    def test_prende_l_iniziale_di_ogni_parola(self):
+        self.assertEqual(initials("mario rossi"), "MR")
+
+    def test_non_conta_gli_spazi_multipli(self):
+        self.assertEqual(initials("mario  rossi"), "MR")
+
+    def test_ignora_gli_spazi_ai_bordi(self):
+        self.assertEqual(initials("  mario rossi  "), "MR")
+
+    def test_tratta_i_tab_come_spazi(self):
+        self.assertEqual(initials("mario\t\trossi"), "MR")
+
+    def test_mette_in_maiuscolo_le_iniziali_gia_maiuscole(self):
+        self.assertEqual(initials("Mario Rossi"), "MR")
+
+    def test_unisce_le_iniziali_senza_separatori(self):
+        self.assertEqual(initials("anna maria luisa rossi"), "AMLR")
+
+    def test_prende_una_sola_lettera_da_una_parola_di_un_carattere(self):
+        self.assertEqual(initials("a b"), "AB")
+
+    def test_lascia_vuota_la_stringa_vuota(self):
+        self.assertEqual(initials(""), "")
+
+    def test_lascia_vuota_una_stringa_di_soli_spazi(self):
+        self.assertEqual(initials("   "), "")
+
+    def test_mette_in_maiuscolo_anche_le_lettere_accentate(self):
+        self.assertEqual(initials("èlia òrsi"), "ÈÒ")
+
+    def test_da_le_stesse_iniziali_per_le_due_forme_unicode(self):
+        nome = "èlia òrsi"
+        self.assertEqual(
+            initials(unicodedata.normalize("NFD", nome)),
+            initials(unicodedata.normalize("NFC", nome)),
+        )
+        self.assertEqual(initials(unicodedata.normalize("NFD", nome)), "ÈÒ")
 
 
 if __name__ == "__main__":
