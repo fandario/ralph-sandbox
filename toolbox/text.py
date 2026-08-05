@@ -26,6 +26,12 @@ def titlecase(value: str) -> str:
     return " ".join(parola.capitalize() for parola in squeeze(value).split(" "))
 
 
+def reverse_words(value: str) -> str:
+    """Inverte l'ordine delle parole della stringa, non i loro caratteri."""
+    # Delega a `squeeze` la politica sugli spazi, così resta una sola.
+    return " ".join(reversed(squeeze(value).split(" ")))
+
+
 def initials(value: str) -> str:
     """Unisce in maiuscolo la prima lettera di ogni parola."""
     # NFC come in `slugify`: ricompone i segni combinanti, altrimenti l'iniziale

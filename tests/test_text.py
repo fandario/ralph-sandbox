@@ -5,7 +5,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from toolbox.text import initials, slugify, squeeze, titlecase, truncate  # noqa: E402
+from toolbox.text import (  # noqa: E402
+    initials,
+    reverse_words,
+    slugify,
+    squeeze,
+    titlecase,
+    truncate,
+)
 
 
 class Squeeze(unittest.TestCase):
@@ -104,6 +111,30 @@ class Titlecase(unittest.TestCase):
 
     def test_mette_in_maiuscolo_anche_le_lettere_accentate(self):
         self.assertEqual(titlecase("èlia di milano"), "Èlia Di Milano")
+
+
+class ReverseWords(unittest.TestCase):
+    def test_inverte_l_ordine_delle_parole(self):
+        self.assertEqual(reverse_words("ciao mondo bello"), "bello mondo ciao")
+
+    def test_non_inverte_i_caratteri_delle_parole(self):
+        self.assertEqual(reverse_words("abc def"), "def abc")
+
+    def test_normalizza_gli_spazi_come_squeeze(self):
+        grezza = "  ciao   mondo bello "
+        self.assertEqual(reverse_words(grezza), "bello mondo ciao")
+
+    def test_tratta_i_tab_come_spazi(self):
+        self.assertEqual(reverse_words("ciao\t\tmondo"), "mondo ciao")
+
+    def test_lascia_vuota_la_stringa_vuota(self):
+        self.assertEqual(reverse_words(""), "")
+
+    def test_lascia_vuota_una_stringa_di_soli_spazi(self):
+        self.assertEqual(reverse_words("   "), "")
+
+    def test_lascia_invariata_una_sola_parola(self):
+        self.assertEqual(reverse_words("  ciao "), "ciao")
 
 
 class Initials(unittest.TestCase):
