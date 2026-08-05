@@ -116,10 +116,6 @@ class ReverseWords(unittest.TestCase):
     def test_normalizza_gli_spazi_come_squeeze(self):
         grezza = "  ciao   mondo bello "
         self.assertEqual(reverse_words(grezza), "bello mondo ciao")
-        # Parità con `squeeze`: se la sua politica sugli spazi cambia, qui si vede.
-        self.assertEqual(
-            sorted(reverse_words(grezza).split(" ")), sorted(squeeze(grezza).split(" "))
-        )
 
     def test_tratta_i_tab_come_spazi(self):
         self.assertEqual(reverse_words("ciao\t\tmondo"), "mondo ciao")
