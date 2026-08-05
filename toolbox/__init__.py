@@ -1,5 +1,5 @@
 """Utilità di testo minimali."""
 
-from .text import slugify, squeeze, truncate
+from .text import slugify, squeeze, titlecase, truncate
 
-__all__ = ["squeeze", "truncate", "slugify"]
+__all__ = ["squeeze", "truncate", "slugify", "titlecase"]
