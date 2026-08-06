@@ -44,13 +44,40 @@ def initials(value: str) -> str:
 
 def strip_accents(value: str) -> str:
     """Toglie gli accenti dalle lettere lasciando invariato il resto della stringa."""
-    # NFD separa la lettera dal suo segno diacritico, che ha categoria "Mn"
-    # (mark, nonspacing): scartando quelli resta la lettera nuda.
-    decomposta = unicodedata.normalize("NFD", value)
-    senza_segni = "".join(c for c in decomposta if unicodedata.category(c) != "Mn")
-    # NFC finale: quello che NFD ha scomposto senza essere un accento — l'hangul,
-    # per dire — torna com'era, e la forma d'ingresso non cambia il risultato.
-    return unicodedata.normalize("NFC", senza_segni)
+    # Si lavora un gruppo per volta — un carattere con i segni che lo seguono —
+    # perché quello da cui non si toglie niente va restituito tale e quale:
+    # normalizzare tutta la stringa in uscita cambierebbe anche caratteri senza
+    # accento (U+2126 OHM SIGN diventerebbe l'omega greca).
+    gruppi: list[str] = []
+    for carattere in value:
+        if gruppi and unicodedata.category(carattere).startswith("M"):
+            gruppi[-1] += carattere
+        else:
+            gruppi.append(carattere)
+
+    pezzi = []
+    for gruppo in gruppi:
+        # NFD separa la lettera dal suo segno diacritico, che ha categoria "Mn"
+        # (mark, nonspacing). Si scartano solo i segni che stanno su una lettera:
+        # su altro portano il significato del carattere e toglierli lo ribalta —
+        # `≠` si scompone in `=` più U+0338 e diventerebbe `=`.
+        # Restano fuori i diacritici incorporati nel codepoint, che NFD non
+        # scompone: `ø ł đ` e simili passano interi, per loro servirebbe una
+        # tabella di mappatura esplicita.
+        decomposto = unicodedata.normalize("NFD", gruppo)
+        su_una_lettera = unicodedata.category(decomposto[0]).startswith("L")
+        senza_segni = "".join(
+            c
+            for c in decomposto
+            if not (su_una_lettera and unicodedata.category(c) == "Mn")
+        )
+        if senza_segni == decomposto:
+            pezzi.append(gruppo)
+        else:
+            # NFC solo su ciò che si è toccato: la lettera nuda torna a essere
+            # un singolo codepoint anche se l'ingresso era già scomposto.
+            pezzi.append(unicodedata.normalize("NFC", senza_segni))
+    return "".join(pezzi)
 
 
 def slugify(value: str) -> str:

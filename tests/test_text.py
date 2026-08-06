@@ -205,10 +205,28 @@ class StripAccents(unittest.TestCase):
         )
         self.assertEqual(strip_accents(unicodedata.normalize("NFD", parola)), "citta")
 
-    def test_ricompone_i_caratteri_scomponibili_che_non_sono_accenti(self):
-        # "한" si scompone in jamo che non sono segni diacritici: senza
-        # ricomposizione finale uscirebbe spezzettato, e non è un accento.
+    def test_lascia_intatti_i_caratteri_scomponibili_che_non_sono_accenti(self):
+        # "한" si scompone in jamo che non sono segni diacritici: non c'è
+        # nessun accento da togliere, quindi deve uscire com'è entrato.
         self.assertEqual(strip_accents("한"), "한")
+
+    def test_tiene_i_segni_che_non_stanno_su_una_lettera(self):
+        # "≠" si scompone in "=" più U+0338: scartare il segno combinante
+        # direbbe il contrario dell'ingresso.
+        self.assertEqual(strip_accents("a ≠ b"), "a ≠ b")
+        self.assertEqual(strip_accents("x ∉ S"), "x ∉ S")
+        self.assertEqual(strip_accents("1 ≮ 2"), "1 ≮ 2")
+
+    def test_non_rinormalizza_i_caratteri_che_non_tocca(self):
+        # Decomposizioni singleton: normalizzare l'uscita li sostituirebbe con
+        # un altro codepoint pur non essendoci accenti da togliere.
+        for carattere in ("Ω", "K"):
+            with self.subTest(carattere=carattere):
+                self.assertEqual(strip_accents(carattere), carattere)
+
+    def test_tiene_un_segno_combinante_senza_carattere_di_base(self):
+        # Accento acuto combinante da solo: non c'è nessuna lettera sotto.
+        self.assertEqual(strip_accents("́"), "́")
 
 
 if __name__ == "__main__":
