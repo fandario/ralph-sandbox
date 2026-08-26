@@ -10,6 +10,7 @@ from toolbox.text import (  # noqa: E402
     reverse_words,
     slugify,
     squeeze,
+    strip_accents,
     titlecase,
     truncate,
 )
@@ -175,6 +176,57 @@ class Initials(unittest.TestCase):
             initials(unicodedata.normalize("NFC", nome)),
         )
         self.assertEqual(initials(unicodedata.normalize("NFD", nome)), "ÈÒ")
+
+
+class StripAccents(unittest.TestCase):
+    def test_toglie_l_accento_tenendo_la_lettera(self):
+        self.assertEqual(strip_accents("perché"), "perche")
+
+    def test_toglie_l_accento_grave(self):
+        self.assertEqual(strip_accents("città"), "citta")
+
+    def test_lascia_invariati_i_caratteri_senza_accento(self):
+        self.assertEqual(strip_accents("ciao mondo"), "ciao mondo")
+
+    def test_lascia_vuota_la_stringa_vuota(self):
+        self.assertEqual(strip_accents(""), "")
+
+    def test_tiene_le_maiuscole(self):
+        self.assertEqual(strip_accents("Èlia"), "Elia")
+
+    def test_lascia_invariati_spazi_e_punteggiatura(self):
+        self.assertEqual(strip_accents("  perché, però!  "), "  perche, pero!  ")
+
+    def test_da_lo_stesso_risultato_per_le_due_forme_unicode(self):
+        parola = "città"
+        self.assertEqual(
+            strip_accents(unicodedata.normalize("NFD", parola)),
+            strip_accents(unicodedata.normalize("NFC", parola)),
+        )
+        self.assertEqual(strip_accents(unicodedata.normalize("NFD", parola)), "citta")
+
+    def test_lascia_intatti_i_caratteri_scomponibili_che_non_sono_accenti(self):
+        # "한" si scompone in jamo che non sono segni diacritici: non c'è
+        # nessun accento da togliere, quindi deve uscire com'è entrato.
+        self.assertEqual(strip_accents("한"), "한")
+
+    def test_tiene_i_segni_che_non_stanno_su_una_lettera(self):
+        # "≠" si scompone in "=" più U+0338: scartare il segno combinante
+        # direbbe il contrario dell'ingresso.
+        self.assertEqual(strip_accents("a ≠ b"), "a ≠ b")
+        self.assertEqual(strip_accents("x ∉ S"), "x ∉ S")
+        self.assertEqual(strip_accents("1 ≮ 2"), "1 ≮ 2")
+
+    def test_non_rinormalizza_i_caratteri_che_non_tocca(self):
+        # Decomposizioni singleton: normalizzare l'uscita li sostituirebbe con
+        # un altro codepoint pur non essendoci accenti da togliere.
+        for carattere in ("Ω", "K"):
+            with self.subTest(carattere=carattere):
+                self.assertEqual(strip_accents(carattere), carattere)
+
+    def test_tiene_un_segno_combinante_senza_carattere_di_base(self):
+        # Accento acuto combinante da solo: non c'è nessuna lettera sotto.
+        self.assertEqual(strip_accents("́"), "́")
 
 
 if __name__ == "__main__":
